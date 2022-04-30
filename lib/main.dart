@@ -1,5 +1,6 @@
 import 'package:digi_store_ui/apiUrl.dart';
 import 'package:digi_store_ui/models/page_view_model.dart';
+import 'package:digi_store_ui/models/special_offer_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_indicators/progress_indicators.dart';
@@ -15,6 +16,9 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      theme: ThemeData(
+        fontFamily: 'vazir'
+      ),
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
@@ -30,6 +34,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   Future<List<PageViewModel>>? futurePageView;
+  Future<List<SpecialOfferModel>>? futureSpecial;
+
   PageController pageController = PageController();
 
   Future<List<PageViewModel>> sendRequestPageView() async {
@@ -51,10 +57,34 @@ class _HomePageState extends State<HomePage> {
     return model;
   }
 
+  Future<List<SpecialOfferModel>> sendRequestSpecialOffer() async {
+    List<SpecialOfferModel> specialModels = [];
+
+    var response = await Dio().get(offerProductAPI);
+    print(response.statusCode);
+    print(response.data);
+
+    for (var item in response.data['products']) {
+      specialModels.add(
+        SpecialOfferModel(
+          id: item['id'],
+          imageUrl: item['imageUrl'],
+          offPrecent: item['off_precent'],
+          offPrice: item['off_price'],
+          price: item['price'],
+          productName: item['product_name'],
+        ),
+      );
+    }
+
+    return specialModels;
+  }
+
   @override
   void initState() {
     super.initState();
     futurePageView = sendRequestPageView();
+    futureSpecial = sendRequestSpecialOffer();
   }
 
   @override
@@ -76,6 +106,7 @@ class _HomePageState extends State<HomePage> {
       body: Container(
         child: Column(
           children: [
+            //  *slider
             Container(
               height: 250,
               child: FutureBuilder<List<PageViewModel>>(
@@ -115,7 +146,7 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           ),
-                        )
+                        ),
                       ],
                     );
                   } else {
@@ -129,12 +160,88 @@ class _HomePageState extends State<HomePage> {
                 },
               ),
             ),
+            // *specail offer
+            Padding(
+              padding: EdgeInsets.only(top: 10),
+              child: Container(
+                color: Colors.red,
+                height: 300,
+                child: FutureBuilder<List<SpecialOfferModel>>(
+                  future: futureSpecial,
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData) {
+                      return ListView.builder(
+                        reverse: true,
+                        shrinkWrap: true,
+                        scrollDirection: Axis.horizontal,
+                        itemCount: snapshot.data!.length,
+                        itemBuilder: (context, index) {
+                          if (index == 0) {
+                            return Container(
+                              height: 300,
+                              width: 200,
+                              child: Column(
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 15.0,
+                                      left: 10,
+                                      right: 10,
+                                    ),
+                                    child: Image.asset(
+                                      'images/pic0.png',
+                                      fit: BoxFit.cover,
+                                      height: 230,
+                                    ),
+                                  ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(bottom: 5.0),
+                                    child: OutlinedButton(
+                                      style: OutlinedButton.styleFrom(
+                                          side: BorderSide(
+                                        color: Colors.white,
+                                        width: 2,
+                                      )),
+                                      onPressed: () {},
+                                      child: Text(
+                                        'مشاهده همه',
+                                        style: TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 15,
+                                        ),
+                                      ),
+                                    ),
+                                  )
+                                ],
+                              ),
+                            );
+                          } else {
+                            return Container(
+                              width: 200,
+                            );
+                          }
+                        },
+                      );
+                    } else {
+                      return Center(
+                        child: JumpingDotsProgressIndicator(
+                          fontSize: 60,
+                          dotSpacing: 5,
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+            ),
           ],
         ),
       ),
     );
   }
 
+
+// *slider page
   Widget PageViewItems(PageViewModel data) {
     return Padding(
       padding: EdgeInsets.only(
