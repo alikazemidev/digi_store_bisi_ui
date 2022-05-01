@@ -16,9 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      theme: ThemeData(
-        fontFamily: 'vazir'
-      ),
+      theme: ThemeData(fontFamily: 'vazir'),
       debugShowCheckedModeBanner: false,
       home: HomePage(),
     );
@@ -177,11 +175,13 @@ class _HomePageState extends State<HomePage> {
                         itemCount: snapshot.data!.length,
                         itemBuilder: (context, index) {
                           if (index == 0) {
+                            // *first child of listview
                             return Container(
                               height: 300,
                               width: 200,
                               child: Column(
                                 children: [
+                                  //  *image on top of see all button
                                   Padding(
                                     padding: const EdgeInsets.only(
                                       top: 15.0,
@@ -194,6 +194,7 @@ class _HomePageState extends State<HomePage> {
                                       height: 230,
                                     ),
                                   ),
+                                  // *see all button
                                   Padding(
                                     padding: const EdgeInsets.only(bottom: 5.0),
                                     child: OutlinedButton(
@@ -211,14 +212,12 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                     ),
-                                  )
+                                  ),
                                 ],
                               ),
                             );
                           } else {
-                            return Container(
-                              width: 200,
-                            );
+                            return specialOfferItem(snapshot.data![index - 1]);
                           }
                         },
                       );
@@ -240,7 +239,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-
 // *slider page
   Widget PageViewItems(PageViewModel data) {
     return Padding(
@@ -255,6 +253,91 @@ class _HomePageState extends State<HomePage> {
           child: Image.network(
             data.imageUrl!,
             fit: BoxFit.cover,
+          ),
+        ),
+      ),
+    );
+  }
+
+// *special offer generator
+  Widget specialOfferItem(SpecialOfferModel specialOfferModel) {
+    return Container(
+      width: 200,
+      height: 300,
+      child: Card(
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
+        child: Container(
+          width: 200,
+          child: Column(
+            children: [
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Image.network(
+                  specialOfferModel.imageUrl!,
+                  height: 150,
+                  fit: BoxFit.fill,
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Text(specialOfferModel.productName!),
+              ),
+              Expanded(
+                child: Container(
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(10.0),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.end,
+                          children: [
+                            Text(
+                              specialOfferModel.offPrice.toString() + 'T',
+                              style: TextStyle(
+                                fontSize: 18,
+                              ),
+                            ),
+                            Text(
+                              specialOfferModel.price.toString() + 'T',
+                              style: TextStyle(
+                                decoration: TextDecoration.lineThrough,
+                                fontSize: 15,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Container(
+                        margin: EdgeInsets.only(top: 10),
+                        height: 30,
+                        decoration: BoxDecoration(
+                          color: Colors.red,
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        padding: EdgeInsets.only(bottom: 5, right: 5),
+                        // alignment: Alignment.bottomCenter,
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 10,
+                            vertical: 2,
+                          ),
+                          child: Text(
+                            specialOfferModel.offPrecent.toString() + "%",
+                            textAlign: TextAlign.center,
+                            style: TextStyle(
+                              fontSize: 18,
+                              color: Colors.white,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
       ),
