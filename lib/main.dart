@@ -1,6 +1,7 @@
-import 'package:digi_store_ui/apiUrl.dart';
-import 'package:digi_store_ui/models/page_view_model.dart';
-import 'package:digi_store_ui/models/special_offer_model.dart';
+import './apiUrl.dart';
+import './models/event_model.dart';
+import './models/page_view_model.dart';
+import './models/special_offer_model.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:progress_indicators/progress_indicators.dart';
@@ -33,9 +34,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   Future<List<PageViewModel>>? futurePageView;
   Future<List<SpecialOfferModel>>? futureSpecial;
-
+  Future<List<EventsModel>>? futureEvents;
   PageController pageController = PageController();
 
+// *slider
   Future<List<PageViewModel>> sendRequestPageView() async {
     List<PageViewModel> model = [];
     try {
@@ -55,12 +57,11 @@ class _HomePageState extends State<HomePage> {
     return model;
   }
 
+// *offer product
   Future<List<SpecialOfferModel>> sendRequestSpecialOffer() async {
     List<SpecialOfferModel> specialModels = [];
 
     var response = await Dio().get(offerProductAPI);
-    print(response.statusCode);
-    print(response.data);
 
     for (var item in response.data['products']) {
       specialModels.add(
@@ -78,11 +79,27 @@ class _HomePageState extends State<HomePage> {
     return specialModels;
   }
 
+// *events poster
+  Future<List<EventsModel>> sendRequestEvents() async {
+    List<EventsModel> models = [];
+    var response = await Dio().get(offerProductAPI);
+    for (var item in response.data["products"]) {
+      models.add(
+        EventsModel(
+          imageurl: item["imageUrl"],
+        ),
+      );
+    }
+
+    return models;
+  }
+
   @override
   void initState() {
     super.initState();
     futurePageView = sendRequestPageView();
     futureSpecial = sendRequestSpecialOffer();
+    futureEvents = sendRequestEvents();
   }
 
   @override
@@ -101,7 +118,7 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      body: Container(
+      body: SingleChildScrollView(
         child: Column(
           children: [
             //  *slider
@@ -233,6 +250,38 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
             ),
+            // *event poster
+            Container(
+              width: double.infinity,
+              child: FutureBuilder<List<EventsModel>>(
+                future: futureEvents,
+                builder: (context, snapshot) {
+                  if (snapshot.hasData) {
+                    List<EventsModel> model = snapshot.data!;
+                    return Container(
+                      height: 400,
+                      child: GridView.builder(
+                        itemCount: 4,
+                        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
+                          crossAxisCount: 2,
+                        ),
+                        itemBuilder: (BuildContext context, index) {
+                          return Card(
+                            child: Image.network(
+                              model[index].imageurl!,
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  } else {
+                    return Center(
+                      child: JumpingDotsProgressIndicator(),
+                    );
+                  }
+                },
+              ),
+            )
           ],
         ),
       ),
