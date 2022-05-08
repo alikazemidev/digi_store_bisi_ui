@@ -1,3 +1,5 @@
+import 'package:digi_store_ui/all_products_screen.dart';
+
 import './apiUrl.dart';
 import './models/event_model.dart';
 import './models/page_view_model.dart';
@@ -82,7 +84,7 @@ class _HomePageState extends State<HomePage> {
 // *events poster
   Future<List<EventsModel>> sendRequestEvents() async {
     List<EventsModel> models = [];
-    var response = await Dio().get(offerProductAPI);
+    var response = await Dio().get(bannerPostAPI);
     for (var item in response.data["products"]) {
       models.add(
         EventsModel(
@@ -220,7 +222,15 @@ class _HomePageState extends State<HomePage> {
                                         color: Colors.white,
                                         width: 2,
                                       )),
-                                      onPressed: () {},
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                AllProductsScreen(),
+                                          ),
+                                        );
+                                      },
                                       child: Text(
                                         'مشاهده همه',
                                         style: TextStyle(
@@ -261,14 +271,21 @@ class _HomePageState extends State<HomePage> {
                     return Container(
                       height: 400,
                       child: GridView.builder(
+                        shrinkWrap: true,
                         itemCount: 4,
                         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
                           crossAxisCount: 2,
                         ),
                         itemBuilder: (BuildContext context, index) {
-                          return Card(
-                            child: Image.network(
-                              model[index].imageurl!,
+                          return Container(
+                            margin: EdgeInsets.all(10),
+                            height: MediaQuery.of(context).size.height / 8,
+                            child: ClipRRect(
+                              borderRadius: BorderRadius.circular(15),
+                              child: Image.network(
+                                model[index].imageurl!,
+                                fit: BoxFit.fill,
+                              ),
                             ),
                           );
                         },
