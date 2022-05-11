@@ -1,3 +1,4 @@
+import 'package:digi_store_ui/shop_list_screen.dart';
 import 'package:flutter/material.dart';
 
 class BottomNav extends StatelessWidget {
@@ -54,7 +55,13 @@ class BottomNav extends StatelessWidget {
                     ),
                   ),
                   IconButton(
-                    onPressed: () {},
+                    onPressed: () {
+                      Navigator.of(context).push(
+                        MaterialPageRoute(
+                          builder: (context) => ShopListScreen(),
+                        ),
+                      );
+                    },
                     icon: Icon(
                       Icons.shopping_basket,
                       color: Colors.white,
